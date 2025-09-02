@@ -1,8 +1,12 @@
 /* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light dark;
 }
 
 body {
@@ -10,8 +14,19 @@ body {
   font-family: 'Roboto Mono', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
   min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+body.light {
+  background-color: #f5f5f7;
+  color: #2d2d2d;
+}
+
+body.dark {
+  background-color: #121212;
+  color: #ffffff;
 }
 
 #root {
@@ -22,20 +37,65 @@ body {
   min-height: 100vh;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
+/* Custom scrollbar for light mode */
+body.light ::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
-  background: #1e1e1e;
+body.light ::-webkit-scrollbar-track {
+  background: #f0f0f0;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #7c4dff;
+body.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #7c4dff, #ff4081);
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #ff4081;
+body.light ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #9c75ff, #ff79b0);
+}
+
+/* Custom scrollbar for dark mode */
+body.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.dark ::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #7c4dff, #ff4081);
+  border-radius: 4px;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #9c75ff, #ff79b0);
+}
+
+/* Typing animation effects */
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.typewriter {
+  overflow: hidden;
+  border-right: 3px solid #7c4dff;
+  white-space: nowrap;
+  animation: typewriter 4s steps(40) 1s 1 normal both, blink 1s steps(1) infinite;
+}
+
+.fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
