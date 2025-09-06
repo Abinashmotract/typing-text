@@ -28,12 +28,10 @@ const Timer = ({ isActive, onTimeUpdate }) => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-
   return (
     <Typography variant="h4" component="div" sx={{ fontFamily: '"Roboto Mono", monospace' }}>
       {formatTime(time)}
     </Typography>
   );
 };
-
 export default Timer;

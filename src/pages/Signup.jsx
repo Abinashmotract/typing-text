@@ -38,8 +38,6 @@ const Signup = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    
-    // Clear error when user starts typing
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -56,44 +54,35 @@ const Signup = () => {
     if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
     if (!formData.password) newErrors.password = 'Password is required';
     if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
-    
     if (formData.phoneNumber && !/^[0-9]{10}$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Phone number must be exactly 10 digits';
     }
-    
     if (formData.password && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(formData.password)) {
       newErrors.password = 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character';
     }
-    
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     setLoading(true);
-    
     const result = await signup({
       name: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       password: formData.password,
     });
-    
     if (result.success) {
       setSnackbar({ open: true, message: result.message || 'Signup successful! Please login.', severity: 'success' });
       setTimeout(() => navigate('/login'), 2000);
     } else {
       setSnackbar({ open: true, message: result.message, severity: 'error' });
     }
-    
     setLoading(false);
   };
 

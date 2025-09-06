@@ -11,7 +11,6 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import { AuthProvider } from './context/AuthContext';
 
-// Move the getDesignTokens function outside the component
 const getDesignTokens = (mode) => ({
   palette: {
     mode,
@@ -71,7 +70,6 @@ const getDesignTokens = (mode) => ({
 function ThemeWrapper({ children }) {
   const { state } = useTypingTest();
   const theme = createTheme(getDesignTokens(state.theme));
-
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
@@ -97,5 +95,4 @@ function App() {
     </TypingTestProvider>
   );
 }
-
 export default App;

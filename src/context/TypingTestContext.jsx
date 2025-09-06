@@ -3,22 +3,17 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 
 const TypingTestContext = createContext();
 
-// Check if user has a theme preference in localStorage
 const getInitialTheme = () => {
   if (typeof window !== 'undefined' && window.localStorage) {
     const storedPrefs = window.localStorage.getItem('color-theme');
     if (typeof storedPrefs === 'string') {
       return storedPrefs;
     }
-
-    // Check for system preference
     const userMedia = window.matchMedia('(prefers-color-scheme: dark)');
     if (userMedia.matches) {
       return 'dark';
     }
   }
-
-  // Default to dark theme
   return 'dark';
 };
 
@@ -53,7 +48,6 @@ function typingTestReducer(state, action) {
       return { ...state, ...action.payload };
     case 'TOGGLE_THEME':
       const newTheme = state.theme === 'light' ? 'dark' : 'light';
-      // Save to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('color-theme', newTheme);
       }
@@ -66,10 +60,8 @@ function typingTestReducer(state, action) {
 export const TypingTestProvider = ({ children }) => {
   const [state, dispatch] = useReducer(typingTestReducer, initialState);
 
-  // Apply theme class to document element
   useEffect(() => {
     const root = window.document.documentElement;
-    
     if (state.theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');

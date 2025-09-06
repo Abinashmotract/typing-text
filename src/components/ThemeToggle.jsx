@@ -37,5 +37,4 @@ const ThemeToggle = () => {
     </Tooltip>
   );
 };
-
 export default ThemeToggle;

@@ -2,17 +2,16 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const API_BASE_URL = 'http://localhost:5055/api'; // Backend URL
+const API_BASE_URL = 'https://typing-backend-ldou.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // important for sending cookies
+  withCredentials: true,
 });
 
-// Add token from cookies to requests if available
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get('accessToken');
@@ -24,7 +23,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle token refresh on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -53,9 +51,7 @@ api.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-
     return Promise.reject(error);
   }
 );
-
 export default api;

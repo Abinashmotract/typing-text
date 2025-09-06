@@ -27,21 +27,18 @@ export const useTypingLogic = () => {
         state.startTime,
         state.endTime
       );
-      
       let errors = 0;
       for (let i = 0; i < state.userInput.length; i++) {
         if (state.userInput[i] !== state.text[i]) {
           errors++;
         }
       }
-      
       const accuracy = Math.max(
         0,
         Math.round(
           ((state.userInput.length - errors) / state.userInput.length) * 100
         )
       );
-      
       dispatch({
         type: 'UPDATE_STATS',
         payload: { wpm, accuracy, errors, totalChars: state.userInput.length },
@@ -51,14 +48,10 @@ export const useTypingLogic = () => {
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    
     if (!state.isTyping && value.length > 0) {
       dispatch({ type: 'START_TYPING' });
     }
-    
     dispatch({ type: 'SET_USER_INPUT', payload: value });
-    
-    // Calculate current index for cursor position
     const newIndex = value.length;
     dispatch({ type: 'UPDATE_STATS', payload: { currentIndex: newIndex } });
   };
@@ -68,7 +61,6 @@ export const useTypingLogic = () => {
     const newText = generateRandomText();
     dispatch({ type: 'SET_TEXT', payload: newText });
   };
-
   return {
     text: state.text,
     userInput: state.userInput,

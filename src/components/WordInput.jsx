@@ -20,7 +20,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const WordInput = ({ value, onChange, disabled, placeholder }) => {
+const WordInput = ({ value, onChange, onPaste, onCopy, onCut, disabled, placeholder }) => {
   return (
     <StyledTextField
       fullWidth
@@ -29,6 +29,9 @@ const WordInput = ({ value, onChange, disabled, placeholder }) => {
       maxRows={4}
       value={value}
       onChange={onChange}
+      onPaste={onPaste}
+      onCopy={onCopy}
+      onCut={onCut}
       disabled={disabled}
       placeholder={placeholder || "Start typing..."}
       variant="outlined"
@@ -36,5 +39,4 @@ const WordInput = ({ value, onChange, disabled, placeholder }) => {
     />
   );
 };
-
 export default WordInput;

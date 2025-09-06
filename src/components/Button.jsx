@@ -1,6 +1,5 @@
 // src/components/Button.jsx
 import { Button as MuiButton } from '@mui/material';
-
 const Button = ({ children, variant = 'contained', color = 'primary', onClick, ...props }) => {
   return (
     <MuiButton
@@ -19,5 +18,4 @@ const Button = ({ children, variant = 'contained', color = 'primary', onClick, .
     </MuiButton>
   );
 };
-
 export default Button;
