@@ -1,33 +1,45 @@
 // src/pages/TypingTest.jsx
-import { Container, Grid, Paper, Typography, Box, keyframes, AppBar, Toolbar } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import TextDisplay from '../components/TextDisplay';
-import WordInput from '../components/WordInput';
-import Timer from '../components/Timer';
-import Button from '../components/Button';
-import ThemeToggle from '../components/ThemeToggle';
-import { useTypingLogic } from '../hooks/useTypingLogic'; // Fixed import
-import { useTypingTest } from '../context/TypingTestContext';
+import { useState, useEffect } from 'react'
+import {
+  Container,
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  keyframes,
+  AppBar,
+  Toolbar
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
+import TextDisplay from '../components/TextDisplay'
+import WordInput from '../components/WordInput'
+import Timer from '../components/Timer'
+import Button from '../components/Button'
+import ThemeToggle from '../components/ThemeToggle'
+import { useTypingLogic } from '../hooks/useTypingLogic'
+import { useTypingTest } from '../context/TypingTestContext'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 
-// Background animation keyframes
 const float = keyframes`
   0% { transform: translate(0, 0) rotate(0deg) scale(1); }
   33% { transform: translate(30px, 50px) rotate(120deg) scale(1.1); }
   66% { transform: translate(-20px, 20px) rotate(240deg) scale(0.9); }
   100% { transform: translate(0, 0) rotate(360deg) scale(1); }
-`;
+`
 
 const pulse = keyframes`
   0% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.05); opacity: 1; }
   100% { transform: scale(1); opacity: 0.8; }
-`;
+`
 
 const gradient = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-`;
+`
 
 const AnimatedBackground = styled(Box)(({ theme }) => ({
   position: 'fixed',
@@ -37,41 +49,43 @@ const AnimatedBackground = styled(Box)(({ theme }) => ({
   height: '100%',
   zIndex: -1,
   overflow: 'hidden',
-  background: theme.palette.mode === 'dark' 
-    ? `linear-gradient(-45deg, #121212, #1a1a2e, #16213e, #0f3460)`
-    : `linear-gradient(-45deg, #f5f5f7, #e8eaf6, #e3f2fd, #f3e5f5)`,
+  background:
+    theme.palette.mode === 'dark'
+      ? `linear-gradient(-45deg, #121212, #1a1a2e, #16213e, #0f3460)`
+      : `linear-gradient(-45deg, #f5f5f7, #e8eaf6, #e3f2fd, #f3e5f5)`,
   backgroundSize: '400% 400%',
   animation: `${gradient} 15s ease infinite`,
-  
+
   '&::before, &::after, & .shape': {
     content: '""',
     position: 'absolute',
     borderRadius: '50%',
-    background: theme.palette.mode === 'dark'
-      ? 'radial-gradient(circle, rgba(124, 77, 255, 0.3) 0%, transparent 70%)'
-      : 'radial-gradient(circle, rgba(124, 77, 255, 0.2) 0%, transparent 70%)',
+    background:
+      theme.palette.mode === 'dark'
+        ? 'radial-gradient(circle, rgba(124, 77, 255, 0.3) 0%, transparent 70%)'
+        : 'radial-gradient(circle, rgba(124, 77, 255, 0.2) 0%, transparent 70%)',
     animation: `${float} 15s infinite linear`,
-    filter: theme.palette.mode === 'dark' ? 'blur(15px)' : 'blur(10px)',
+    filter: theme.palette.mode === 'dark' ? 'blur(15px)' : 'blur(10px)'
   },
-  
+
   '&::before': {
     top: '10%',
     left: '10%',
     width: '30vmin',
     height: '30vmin',
     animationDelay: '0s',
-    animationDuration: '20s',
+    animationDuration: '20s'
   },
-  
+
   '&::after': {
     bottom: '15%',
     right: '10%',
     width: '25vmin',
     height: '25vmin',
     animationDelay: '-5s',
-    animationDuration: '25s',
+    animationDuration: '25s'
   },
-  
+
   '& .shape:nth-of-type(1)': {
     top: '70%',
     left: '20%',
@@ -79,11 +93,12 @@ const AnimatedBackground = styled(Box)(({ theme }) => ({
     height: '20vmin',
     animationDelay: '-10s',
     animationDuration: '30s',
-    background: theme.palette.mode === 'dark'
-      ? 'radial-gradient(circle, rgba(255, 64, 129, 0.3) 0%, transparent 70%)'
-      : 'radial-gradient(circle, rgba(255, 64, 129, 0.2) 0%, transparent 70%)',
+    background:
+      theme.palette.mode === 'dark'
+        ? 'radial-gradient(circle, rgba(255, 64, 129, 0.3) 0%, transparent 70%)'
+        : 'radial-gradient(circle, rgba(255, 64, 129, 0.2) 0%, transparent 70%)'
   },
-  
+
   '& .shape:nth-of-type(2)': {
     top: '20%',
     right: '20%',
@@ -91,11 +106,12 @@ const AnimatedBackground = styled(Box)(({ theme }) => ({
     height: '15vmin',
     animationDelay: '-15s',
     animationDuration: '18s',
-    background: theme.palette.mode === 'dark'
-      ? 'radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 70%)'
-      : 'radial-gradient(circle, rgba(76, 175, 80, 0.2) 0%, transparent 70%)',
-  },
-}));
+    background:
+      theme.palette.mode === 'dark'
+        ? 'radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 70%)'
+        : 'radial-gradient(circle, rgba(76, 175, 80, 0.2) 0%, transparent 70%)'
+  }
+}))
 
 const FloatingParticle = styled(Box)(({ theme, delay, size, left, top }) => ({
   position: 'absolute',
@@ -104,14 +120,15 @@ const FloatingParticle = styled(Box)(({ theme, delay, size, left, top }) => ({
   left: left,
   top: top,
   borderRadius: '50%',
-  background: theme.palette.mode === 'dark'
-    ? `radial-gradient(circle, ${theme.palette.primary.light}20 0%, transparent 70%)`
-    : `radial-gradient(circle, ${theme.palette.primary.light}15 0%, transparent 70%)`,
+  background:
+    theme.palette.mode === 'dark'
+      ? `radial-gradient(circle, ${theme.palette.primary.light}20 0%, transparent 70%)`
+      : `radial-gradient(circle, ${theme.palette.primary.light}15 0%, transparent 70%)`,
   animation: `${float} 20s infinite ease-in-out`,
   animationDelay: `${delay}s`,
   opacity: theme.palette.mode === 'dark' ? 0.6 : 0.4,
-  filter: 'blur(2px)',
-}));
+  filter: 'blur(2px)'
+}))
 
 const StatCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2.5),
@@ -121,18 +138,24 @@ const StatCard = styled(Paper)(({ theme }) => ({
   borderRadius: 16,
   transition: 'transform 0.3s, box-shadow 0.3s',
   animation: `${pulse} 3s infinite ease-in-out`,
-  border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.primary.dark + '30' : theme.palette.primary.light + '50'}`,
-  boxShadow: theme.palette.mode === 'dark'
-    ? `0 8px 32px 0 ${theme.palette.primary.dark}20`
-    : `0 8px 32px 0 ${theme.palette.primary.light}15`,
-  
+  border: `1px solid ${
+    theme.palette.mode === 'dark'
+      ? theme.palette.primary.dark + '30'
+      : theme.palette.primary.light + '50'
+  }`,
+  boxShadow:
+    theme.palette.mode === 'dark'
+      ? `0 8px 32px 0 ${theme.palette.primary.dark}20`
+      : `0 8px 32px 0 ${theme.palette.primary.light}15`,
+
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: theme.palette.mode === 'dark'
-      ? `0 12px 40px 0 ${theme.palette.primary.dark}40`
-      : `0 12px 40px 0 ${theme.palette.primary.light}30`,
-  },
-}));
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? `0 12px 40px 0 ${theme.palette.primary.dark}40`
+        : `0 12px 40px 0 ${theme.palette.primary.light}30`
+  }
+}))
 
 const Title = styled(Typography)(({ theme }) => ({
   background: 'linear-gradient(45deg, #7c4dff, #ff4081, #7c4dff)',
@@ -142,24 +165,37 @@ const Title = styled(Typography)(({ theme }) => ({
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
   animation: `${gradient} 3s linear infinite`,
-  filter: `drop-shadow(0 0 8px ${theme.palette.mode === 'dark' ? 'rgba(124, 77, 255, 0.5)' : 'rgba(124, 77, 255, 0.3)'})`,
+  filter: `drop-shadow(0 0 8px ${
+    theme.palette.mode === 'dark'
+      ? 'rgba(124, 77, 255, 0.5)'
+      : 'rgba(124, 77, 255, 0.3)'
+  })`,
   fontWeight: 800,
-  letterSpacing: '2px',
-}));
+  letterSpacing: '2px'
+}))
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(18, 18, 18, 0.8)' : 'rgba(245, 245, 247, 0.8)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(18, 18, 18, 0.8)'
+      : 'rgba(245, 245, 247, 0.8)',
   backdropFilter: 'blur(10px)',
   boxShadow: 'none',
-  borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
-}));
+  borderBottom: `1px solid ${
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.1)'
+      : 'rgba(0, 0, 0, 0.1)'
+  }`
+}))
 
 const TypingTest = () => {
-  // Get theme state from context
-  const { state } = useTypingTest();
-  const themeMode = state.theme;
-  
-  // Get typing logic from hook
+  const [testDuration, setTestDuration] = useState(0)
+  const { state } = useTypingTest()
+  const themeMode = state.theme
+  const { user } = useAuth();
+
+  console.log(user, 'user ---')
+
   const {
     text,
     userInput,
@@ -171,10 +207,9 @@ const TypingTest = () => {
     totalChars,
     currentIndex,
     handleInputChange,
-    resetTest,
-  } = useTypingLogic();
+    resetTest
+  } = useTypingLogic()
 
-  // Create floating particles for background
   const particles = Array.from({ length: 15 }).map((_, i) => (
     <FloatingParticle
       key={i}
@@ -183,35 +218,56 @@ const TypingTest = () => {
       left={`${Math.random() * 100}%`}
       top={`${Math.random() * 100}%`}
     />
-  ));
+  ))
+
+  const handleTimeUpdate = time => {
+    setTestDuration(time)
+  }
+
+  useEffect(() => {
+    const saveTestResults = async () => {
+      if (isFinished && user) {
+        try {
+          await api.post('/typing-test/save-result', {
+            wpm,
+            accuracy,
+            errors,
+            totalChars,
+            duration: testDuration
+          })
+
+          console.log('Test results saved successfully')
+        } catch (error) {
+          console.error('Failed to save test results:', error)
+        }
+      }
+    }
+
+    saveTestResults()
+  }, [isFinished, user, wpm, accuracy, errors, totalChars, testDuration])
 
   return (
     <>
-      <StyledAppBar position="static" elevation={0}>
-        <Toolbar sx={{ justifyContent: 'flex-end' }}>
-          <ThemeToggle />
-        </Toolbar>
-      </StyledAppBar>
-      
       <AnimatedBackground>
         {particles}
-        <div className="shape" />
-        <div className="shape" />
+        <div className='shape' />
+        <div className='shape' />
       </AnimatedBackground>
-      
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+
+      <Container maxWidth='lg' sx={{ py: 4 }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Title variant="h2" component="h1" gutterBottom>
+          <Title variant='h2' component='h1' gutterBottom>
             Typing Master
           </Title>
-          <Typography 
-            variant="h6" 
-            color="textSecondary" 
-            sx={{ 
+          <Typography
+            variant='h6'
+            color='textSecondary'
+            sx={{
               mb: 3,
-              textShadow: theme => theme.palette.mode === 'dark' 
-                ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                : '0 0 5px rgba(124, 77, 255, 0.3)',
+              textShadow: theme =>
+                theme.palette.mode === 'dark'
+                  ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                  : '0 0 5px rgba(124, 77, 255, 0.3)'
             }}
           >
             Test your typing speed with style
@@ -220,15 +276,19 @@ const TypingTest = () => {
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            <TextDisplay text={text} userInput={userInput} currentIndex={currentIndex} />
-            
+            <TextDisplay
+              text={text}
+              userInput={userInput}
+              currentIndex={currentIndex}
+            />
+
             <Box sx={{ mt: 3, position: 'relative' }}>
               <WordInput
                 value={userInput}
                 onChange={handleInputChange}
                 disabled={isFinished}
               />
-              <Box 
+              <Box
                 sx={{
                   position: 'absolute',
                   bottom: 0,
@@ -241,41 +301,51 @@ const TypingTest = () => {
                   transition: 'transform 0.3s',
                   ...(isTyping && {
                     transform: 'scaleX(1)',
-                    animation: `${pulse} 2s infinite`,
-                  }),
+                    animation: `${pulse} 2s infinite`
+                  })
                 }}
               />
             </Box>
 
-            <Box sx={{ 
-              mt: 3, 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              background: theme => theme.palette.mode === 'dark' 
-                ? 'rgba(30, 30, 30, 0.5)' 
-                : 'rgba(255, 255, 255, 0.5)',
-              borderRadius: 3,
-              p: 2,
-              backdropFilter: 'blur(10px)',
-              border: theme => theme.palette.mode === 'dark' 
-                ? '1px solid rgba(124, 77, 255, 0.2)' 
-                : '1px solid rgba(124, 77, 255, 0.1)',
-            }}>
-              <Timer isActive={isTyping && !isFinished} />
-              <Button 
-                onClick={resetTest} 
-                variant="outlined"
+            <Box
+              sx={{
+                mt: 3,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: theme =>
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(30, 30, 30, 0.5)'
+                    : 'rgba(255, 255, 255, 0.5)',
+                borderRadius: 3,
+                p: 2,
+                backdropFilter: 'blur(10px)',
+                border: theme =>
+                  theme.palette.mode === 'dark'
+                    ? '1px solid rgba(124, 77, 255, 0.2)'
+                    : '1px solid rgba(124, 77, 255, 0.1)'
+              }}
+            >
+              <Timer
+                isActive={isTyping && !isFinished}
+                onTimeUpdate={handleTimeUpdate}
+              />
+              <Button
+                onClick={resetTest}
+                variant='outlined'
                 sx={{
-                  background: 'linear-gradient(45deg, rgba(124, 77, 255, 0.1), rgba(255, 64, 129, 0.1))',
+                  background:
+                    'linear-gradient(45deg, rgba(124, 77, 255, 0.1), rgba(255, 64, 129, 0.1))',
                   border: '1px solid',
                   borderImage: 'linear-gradient(45deg, #7c4dff, #ff4081) 1',
                   '&:hover': {
-                    background: 'linear-gradient(45deg, rgba(124, 77, 255, 0.2), rgba(255, 64, 129, 0.2))',
-                    boxShadow: theme => theme.palette.mode === 'dark' 
-                      ? '0 0 15px rgba(124, 77, 255, 0.5)' 
-                      : '0 0 10px rgba(124, 77, 255, 0.3)',
-                  },
+                    background:
+                      'linear-gradient(45deg, rgba(124, 77, 255, 0.2), rgba(255, 64, 129, 0.2))',
+                    boxShadow: theme =>
+                      theme.palette.mode === 'dark'
+                        ? '0 0 15px rgba(124, 77, 255, 0.5)'
+                        : '0 0 10px rgba(124, 77, 255, 0.3)'
+                  }
                 }}
               >
                 Restart Test
@@ -284,59 +354,92 @@ const TypingTest = () => {
           </Grid>
 
           <Grid item xs={12} md={4}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2.5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 2.5
+              }}
+            >
               <StatCard elevation={3}>
-                <Typography variant="h3" color="primary" gutterBottom sx={{ 
-                  textShadow: theme => theme.palette.mode === 'dark' 
-                    ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                    : '0 0 5px rgba(124, 77, 255, 0.3)' 
-                }}>
+                <Typography
+                  variant='h3'
+                  color='primary'
+                  gutterBottom
+                  sx={{
+                    textShadow: theme =>
+                      theme.palette.mode === 'dark'
+                        ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                        : '0 0 5px rgba(124, 77, 255, 0.3)'
+                  }}
+                >
                   {wpm}
                 </Typography>
-                <Typography variant="h6" color="textSecondary">
+                <Typography variant='h6' color='textSecondary'>
                   Words Per Minute
                 </Typography>
               </StatCard>
 
               <StatCard elevation={3}>
-                <Typography variant="h3" color="primary" gutterBottom sx={{ 
-                  textShadow: theme => theme.palette.mode === 'dark' 
-                    ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                    : '0 0 5px rgba(124, 77, 255, 0.3)' 
-                }}>
+                <Typography
+                  variant='h3'
+                  color='primary'
+                  gutterBottom
+                  sx={{
+                    textShadow: theme =>
+                      theme.palette.mode === 'dark'
+                        ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                        : '0 0 5px rgba(124, 77, 255, 0.3)'
+                  }}
+                >
                   {accuracy}%
                 </Typography>
-                <Typography variant="h6" color="textSecondary">
+                <Typography variant='h6' color='textSecondary'>
                   Accuracy
                 </Typography>
               </StatCard>
 
               <StatCard elevation={3}>
-                <Typography variant="h3" color={errors > 0 ? 'error' : 'primary'} gutterBottom sx={{ 
-                  textShadow: errors > 0 
-                    ? theme => theme.palette.mode === 'dark' 
-                      ? '0 0 10px rgba(244, 67, 54, 0.5)' 
-                      : '0 0 5px rgba(244, 67, 54, 0.3)'
-                    : theme => theme.palette.mode === 'dark' 
-                      ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                      : '0 0 5px rgba(124, 77, 255, 0.3)'
-                }}>
+                <Typography
+                  variant='h3'
+                  color={errors > 0 ? 'error' : 'primary'}
+                  gutterBottom
+                  sx={{
+                    textShadow:
+                      errors > 0
+                        ? theme =>
+                            theme.palette.mode === 'dark'
+                              ? '0 0 10px rgba(244, 67, 54, 0.5)'
+                              : '0 0 5px rgba(244, 67, 54, 0.3)'
+                        : theme =>
+                            theme.palette.mode === 'dark'
+                              ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                              : '0 0 5px rgba(124, 77, 255, 0.3)'
+                  }}
+                >
                   {errors}
                 </Typography>
-                <Typography variant="h6" color="textSecondary">
+                <Typography variant='h6' color='textSecondary'>
                   Errors
                 </Typography>
               </StatCard>
 
               <StatCard elevation={3}>
-                <Typography variant="h3" color="primary" gutterBottom sx={{ 
-                  textShadow: theme => theme.palette.mode === 'dark' 
-                    ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                    : '0 0 5px rgba(124, 77, 255, 0.3)' 
-                }}>
+                <Typography
+                  variant='h3'
+                  color='primary'
+                  gutterBottom
+                  sx={{
+                    textShadow: theme =>
+                      theme.palette.mode === 'dark'
+                        ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                        : '0 0 5px rgba(124, 77, 255, 0.3)'
+                  }}
+                >
                   {totalChars}
                 </Typography>
-                <Typography variant="h6" color="textSecondary">
+                <Typography variant='h6' color='textSecondary'>
                   Characters Typed
                 </Typography>
               </StatCard>
@@ -351,38 +454,63 @@ const TypingTest = () => {
               mt: 4,
               p: 4,
               textAlign: 'center',
-              background: 'linear-gradient(45deg, rgba(124, 77, 255, 0.2), rgba(255, 64, 129, 0.2))',
+              background:
+                'linear-gradient(45deg, rgba(124, 77, 255, 0.2), rgba(255, 64, 129, 0.2))',
               backdropFilter: 'blur(10px)',
               color: 'primary.contrastText',
               borderRadius: 3,
-              border: theme => theme.palette.mode === 'dark' 
-                ? '1px solid rgba(124, 77, 255, 0.3)' 
-                : '1px solid rgba(124, 77, 255, 0.2)',
-              animation: `${pulse} 2s infinite`,
+              border: theme =>
+                theme.palette.mode === 'dark'
+                  ? '1px solid rgba(124, 77, 255, 0.3)'
+                  : '1px solid rgba(124, 77, 255, 0.2)',
+              animation: `${pulse} 2s infinite`
             }}
           >
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 700, 
-              textShadow: theme => theme.palette.mode === 'dark' 
-                ? '0 0 10px rgba(124, 77, 255, 0.5)' 
-                : '0 0 5px rgba(124, 77, 255, 0.3)' 
-            }}>
+            <Typography
+              variant='h4'
+              gutterBottom
+              sx={{
+                fontWeight: 700,
+                textShadow: theme =>
+                  theme.palette.mode === 'dark'
+                    ? '0 0 10px rgba(124, 77, 255, 0.5)'
+                    : '0 0 5px rgba(124, 77, 255, 0.3)'
+              }}
+            >
               Test Completed! 🎉
             </Typography>
-            <Typography variant="h6" sx={{ 
-              textShadow: theme => theme.palette.mode === 'dark' 
-                ? '0 0 5px rgba(255, 255, 255, 0.5)' 
-                : '0 0 3px rgba(0, 0, 0, 0.2)' 
-            }}>
-              You typed at <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>{wpm} WPM</Box> with{' '}
-              <Box component="span" sx={{ color: accuracy > 90 ? 'success.main' : 'warning.main', fontWeight: 700 }}>
+            <Typography
+              variant='h6'
+              sx={{
+                textShadow: theme =>
+                  theme.palette.mode === 'dark'
+                    ? '0 0 5px rgba(255, 255, 255, 0.5)'
+                    : '0 0 3px rgba(0, 0, 0, 0.2)'
+              }}
+            >
+              You typed at{' '}
+              <Box
+                component='span'
+                sx={{ color: 'primary.main', fontWeight: 700 }}
+              >
+                {wpm} WPM
+              </Box>{' '}
+              with{' '}
+              <Box
+                component='span'
+                sx={{
+                  color: accuracy > 90 ? 'success.main' : 'warning.main',
+                  fontWeight: 700
+                }}
+              >
                 {accuracy}% accuracy
-              </Box>.
+              </Box>
+              .
             </Typography>
           </Paper>
         )}
       </Container>
     </>
-  );
-};
-
-export default TypingTest;
+  )
+}
+export default TypingTest
