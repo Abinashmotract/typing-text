@@ -13,6 +13,38 @@ import {Link} from "react-router-dom";
 import {useAuth} from "../context/AuthContext";
 import api from "../services/api";
 
+// Update the OfferCard styled component with a more compact design
+const OfferCard = styled(Paper)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #7c4dff 0%, #ff4081 100%)',
+  color: 'white',
+  padding: theme.spacing(2),
+  borderRadius: 12,
+  textAlign: 'center',
+  marginBottom: theme.spacing(3),
+  position: 'relative',
+  overflow: 'hidden',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 60,
+    height: 60,
+    background: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: '50%',
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: -15,
+    left: -15,
+    width: 40,
+    height: 40,
+    background: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: '50%',
+  },
+}));
+
 const float = keyframes`
   0% { transform: translate(0, 0) rotate(0deg) scale(1); }
   33% { transform: translate(30px, 50px) rotate(120deg) scale(1.1); }
@@ -252,6 +284,58 @@ const TypingTest = () => {
             </AnimatedBackground>
 
             <Container maxWidth="lg" sx={{py: 4}}>
+                <OfferCard elevation={6}>
+                    <Typography
+                        variant="h5"
+                        gutterBottom
+                        sx={{fontWeight: 700, textShadow: "0 2px 4px rgba(0,0,0,0.2)"}}
+                    >
+                        🎉 Special Offer for Typing Masters! 🎉
+                    </Typography>
+                    <Typography variant="h6" sx={{mb: 2, opacity: 0.9, textShadow: "0 1px 2px rgba(0,0,0,0.2)"}}>
+                        Sign up now and get exclusive benefits!
+                    </Typography>
+                    <Box sx={{display: "flex", justifyContent: "center", gap: 3, flexWrap: "wrap"}}>
+                        <Box sx={{textAlign: "center"}}>
+                            <Typography variant="h4" sx={{fontWeight: 800}}>
+                                🏆
+                            </Typography>
+                            <Typography variant="body2">Compete in Weekly Challenges</Typography>
+                        </Box>
+                        <Box sx={{textAlign: "center"}}>
+                            <Typography variant="h4" sx={{fontWeight: 800}}>
+                                📊
+                            </Typography>
+                            <Typography variant="body2">Detailed Progress Analytics</Typography>
+                        </Box>
+                        <Box sx={{textAlign: "center"}}>
+                            <Typography variant="h4" sx={{fontWeight: 800}}>
+                                🎯
+                            </Typography>
+                            <Typography variant="body2">Personalized Training Plans</Typography>
+                        </Box>
+                    </Box>
+                    {!user && (
+                        <Button
+                            variant="contained"
+                            sx={{
+                                mt: 3,
+                                background: "rgba(255, 255, 255, 0.2)",
+                                border: "2px solid white",
+                                color: "white",
+                                fontWeight: 600,
+                                "&:hover": {
+                                    background: "rgba(255, 255, 255, 0.3)",
+                                    transform: "translateY(-2px)",
+                                },
+                            }}
+                            component={Link}
+                            to="/signup"
+                        >
+                            Sign Up Now - It's Free!
+                        </Button>
+                    )}
+                </OfferCard>
                 <Box sx={{textAlign: "center", mb: 4}}>
                     <Title variant="h2" component="h1" gutterBottom>
                         Typing Master
@@ -276,7 +360,14 @@ const TypingTest = () => {
                         <TextDisplay text={text} userInput={userInput} currentIndex={currentIndex} />
 
                         <Box sx={{mt: 3, position: "relative"}}>
-                            <WordInput value={userInput} onChange={handleInputChange} disabled={isFinished} onPaste={handlePaste} onCopy={handleCopy} onCut={handleCut} />
+                            <WordInput
+                                value={userInput}
+                                onChange={handleInputChange}
+                                disabled={isFinished}
+                                onPaste={handlePaste}
+                                onCopy={handleCopy}
+                                onCut={handleCut}
+                            />
                             <Box
                                 sx={{
                                     position: "absolute",
