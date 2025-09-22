@@ -10,6 +10,9 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import { AuthProvider } from './context/AuthContext';
+import Footer from "./components/Footer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 
 const getDesignTokens = (mode) => ({
   palette: {
@@ -79,15 +82,23 @@ function App() {
       <AuthProvider>
         <ThemeWrapper>
           <CssBaseline />
-          <Router>
-            <div className="App">
+         <Router>
+            <div
+              className="App"
+              style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+            >
               <Navbar />
-              <Routes>
-                <Route path="/" element={<TypingTest />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
+              <div style={{ flex: 1 }}>
+                <Routes>
+                  <Route path="/" element={<TypingTest />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/termsconditions" element={<TermsConditions />} />
+                </Routes>
+              </div>
+              <Footer />
             </div>
           </Router>
         </ThemeWrapper>
