@@ -1,48 +1,182 @@
 // src/pages/TypingTest.jsx
-import {useState, useEffect} from "react";
-import {Container, Grid, Paper, Typography, Box, keyframes, AppBar, Toolbar, Alert} from "@mui/material";
-import {styled} from "@mui/material/styles";
+import { useState, useEffect } from "react";
+import { Container, Grid, Paper, Typography, Box, keyframes, AppBar, Toolbar, Alert } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import TextDisplay from "../components/TextDisplay";
 import WordInput from "../components/WordInput";
 import Timer from "../components/Timer";
 import Button from "../components/Button";
 import ThemeToggle from "../components/ThemeToggle";
-import {useTypingLogic} from "../hooks/useTypingLogic";
-import {useTypingTest} from "../context/TypingTestContext";
-import {Link} from "react-router-dom";
-import {useAuth} from "../context/AuthContext";
+import { useTypingLogic } from "../hooks/useTypingLogic";
+import { useTypingTest } from "../context/TypingTestContext";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
 // Update the OfferCard styled component with a more compact design
+const blink = keyframes`
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+`;
+
+const pressKey = keyframes`
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(0.95); }
+  100% { transform: translateY(0) scale(1); }
+`;
+
+const progressFill = keyframes`
+  0% { width: 0%; }
+  100% { width: 100%; }
+`;
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+// Enhanced OfferCard with typing theme
 const OfferCard = styled(Paper)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #7c4dff 0%, #ff4081 100%)',
-  color: 'white',
-  padding: theme.spacing(2),
-  borderRadius: 12,
-  textAlign: 'center',
-  marginBottom: theme.spacing(3),
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
+    background: 'linear-gradient(135deg, #7c4dff 0%, #ff4081 100%)',
+    color: 'white',
+    padding: theme.spacing(4),
+    borderRadius: 20,
+    textAlign: 'center',
+    marginBottom: theme.spacing(3),
+    position: 'relative',
+    overflow: 'hidden',
+    boxShadow: '0 20px 40px rgba(124, 77, 255, 0.3)',
+
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: -50,
+        right: -50,
+        width: 100,
+        height: 100,
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+    },
+
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: -30,
+        left: -30,
+        width: 80,
+        height: 80,
+        background: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: '50%',
+    },
+}));
+
+// Typing Text Component
+const TypingText = styled(({ text, speed, ...props }) => {
+    const [displayText, setDisplayText] = useState('');
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+        if (index < text.length) {
+            const timer = setTimeout(() => {
+                setDisplayText(prev => prev + text.charAt(index));
+                setIndex(prev => prev + 1);
+            }, speed);
+            return () => clearTimeout(timer);
+        }
+    }, [index, text, speed]);
+
+    return <Typography {...props}>{displayText}</Typography>;
+})({});
+
+// Keyboard Key Component
+const KeyboardKey = styled(Box)(({ theme, delay }) => ({
+    background: 'linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05))',
+    border: '1px solid rgba(255,255,255,0.3)',
+    borderRadius: 8,
+    padding: theme.spacing(1, 2),
+    fontWeight: 700,
+    fontSize: '0.9rem',
+    backdropFilter: 'blur(10px)',
+    animation: `${pressKey} 2s infinite ease-in-out`,
+    animationDelay: `${delay}s`,
+    boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+        transform: 'translateY(-3px)',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
+    }
+}));
+
+// Progress Bar Component
+const ProgressBar = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 4,
+    overflow: 'hidden',
+    position: 'relative',
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '0%',
+        background: 'linear-gradient(90deg, #ff4081, #7c4dff)',
+        animation: `${progressFill} 2s ease-out forwards`,
+        borderRadius: 4,
+    }
+}));
+
+// Typing Feature Component
+const TypingFeature = ({ icon, title, description, delay }) => (
+    <Box
+        sx={{
+            textAlign: 'center',
+            p: 2,
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: 2,
+            border: '1px solid rgba(255,255,255,0.1)',
+            transition: 'all 0.3s ease',
+            animation: `${fadeInUp} 0.6s ease-out ${delay}s both`,
+            '&:hover': {
+                transform: 'translateY(-5px)',
+                background: 'rgba(255,255,255,0.1)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+            }
+        }}
+    >
+        <Typography variant="h3" sx={{ mb: 1 }}>{icon}</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>{title}</Typography>
+        <Typography variant="body2" sx={{ opacity: 0.9 }}>{description}</Typography>
+    </Box>
+);
+
+// Floating Key Component
+const FloatingKey = styled(Box)(({ theme, icon, left, delay }) => ({
     position: 'absolute',
-    top: -20,
-    right: -20,
-    width: 60,
-    height: 60,
-    background: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: '50%',
-  },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    bottom: -15,
-    left: -15,
+    left: left,
+    top: '50%',
     width: 40,
     height: 40,
-    background: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: '50%',
-  },
+    background: 'rgba(255,255,255,0.1)',
+    borderRadius: 6,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight: 700,
+    fontSize: '1.2rem',
+    animation: `${float} 3s ease-in-out infinite`,
+    animationDelay: `${delay}s`,
+    border: '1px solid rgba(255,255,255,0.2)',
+    backdropFilter: 'blur(5px)',
+    opacity: 0.7,
 }));
 
 const float = keyframes`
@@ -64,7 +198,7 @@ const gradient = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const AnimatedBackground = styled(Box)(({theme}) => ({
+const AnimatedBackground = styled(Box)(({ theme }) => ({
     position: "fixed",
     top: 0,
     left: 0,
@@ -136,7 +270,7 @@ const AnimatedBackground = styled(Box)(({theme}) => ({
     },
 }));
 
-const FloatingParticle = styled(Box)(({theme, delay, size, left, top}) => ({
+const FloatingParticle = styled(Box)(({ theme, delay, size, left, top }) => ({
     position: "absolute",
     width: size,
     height: size,
@@ -153,7 +287,7 @@ const FloatingParticle = styled(Box)(({theme, delay, size, left, top}) => ({
     filter: "blur(2px)",
 }));
 
-const StatCard = styled(Paper)(({theme}) => ({
+const StatCard = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(2.5),
     textAlign: "center",
     backgroundColor: theme.palette.background.paper,
@@ -161,9 +295,8 @@ const StatCard = styled(Paper)(({theme}) => ({
     borderRadius: 16,
     transition: "transform 0.3s, box-shadow 0.3s",
     animation: `${pulse} 3s infinite ease-in-out`,
-    border: `1px solid ${
-        theme.palette.mode === "dark" ? theme.palette.primary.dark + "30" : theme.palette.primary.light + "50"
-    }`,
+    border: `1px solid ${theme.palette.mode === "dark" ? theme.palette.primary.dark + "30" : theme.palette.primary.light + "50"
+        }`,
     boxShadow:
         theme.palette.mode === "dark"
             ? `0 8px 32px 0 ${theme.palette.primary.dark}20`
@@ -178,7 +311,7 @@ const StatCard = styled(Paper)(({theme}) => ({
     },
 }));
 
-const Title = styled(Typography)(({theme}) => ({
+const Title = styled(Typography)(({ theme }) => ({
     background: "linear-gradient(45deg, #7c4dff, #ff4081, #7c4dff)",
     backgroundSize: "200% auto",
     backgroundClip: "text",
@@ -186,20 +319,42 @@ const Title = styled(Typography)(({theme}) => ({
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     animation: `${gradient} 3s linear infinite`,
-    filter: `drop-shadow(0 0 8px ${
-        theme.palette.mode === "dark" ? "rgba(124, 77, 255, 0.5)" : "rgba(124, 77, 255, 0.3)"
-    })`,
+    filter: `drop-shadow(0 0 8px ${theme.palette.mode === "dark" ? "rgba(124, 77, 255, 0.5)" : "rgba(124, 77, 255, 0.3)"
+        })`,
     fontWeight: 800,
     letterSpacing: "2px",
 }));
 
+// Animated Stat Component
+const AnimatedStat = ({ number, label, suffix }) => {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (count < number) {
+                setCount(prev => prev + 1);
+            }
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [count, number]);
+
+    return (
+        <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, color: '#ffeb3b' }}>
+                {count}{suffix}
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>{label}</Typography>
+        </Box>
+    );
+};
+
 const TypingTest = () => {
     const [testDuration, setTestDuration] = useState(0);
     const [stats, setStats] = useState(null);
-    const [saveStatus, setSaveStatus] = useState({success: null, message: ""});
-    const {state} = useTypingTest();
+    const [saveStatus, setSaveStatus] = useState({ success: null, message: "" });
+    const { state } = useTypingTest();
     const themeMode = state.theme;
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     const {
         text,
@@ -215,7 +370,7 @@ const TypingTest = () => {
         resetTest,
     } = useTypingLogic();
 
-    const particles = Array.from({length: 15}).map((_, i) => (
+    const particles = Array.from({ length: 15 }).map((_, i) => (
         <FloatingParticle
             key={i}
             delay={i * -1.5}
@@ -232,19 +387,19 @@ const TypingTest = () => {
     // Add paste prevention
     const handlePaste = (e) => {
         e.preventDefault();
-        setSaveStatus({success: false, message: "Copy-paste is not allowed in typing tests!"});
+        setSaveStatus({ success: false, message: "Copy-paste is not allowed in typing tests!" });
     };
 
     // Add copy prevention
     const handleCopy = (e) => {
         e.preventDefault();
-        setSaveStatus({success: false, message: "Copying text is not allowed!"});
+        setSaveStatus({ success: false, message: "Copying text is not allowed!" });
     };
 
     // Add cut prevention
     const handleCut = (e) => {
         e.preventDefault();
-        setSaveStatus({success: false, message: "Cutting text is not allowed!"});
+        setSaveStatus({ success: false, message: "Cutting text is not allowed!" });
     };
 
     useEffect(() => {
@@ -259,7 +414,7 @@ const TypingTest = () => {
                         duration: testDuration,
                     });
                     setStats(response.data.stats);
-                    setSaveStatus({success: true, message: response.data.message});
+                    setSaveStatus({ success: true, message: response.data.message });
                 } catch (error) {
                     console.error("Failed to save test results:", error);
                 }
@@ -276,60 +431,169 @@ const TypingTest = () => {
                 <div className="shape" />
             </AnimatedBackground>
 
-            <Container maxWidth="md" sx={{py: 4}}>
-                <OfferCard elevation={6}>
-                    <Typography
-                        variant="h5"
-                        gutterBottom
-                        sx={{fontWeight: 700, textShadow: "0 2px 4px rgba(0,0,0,0.2)"}}
-                    >
-                        🎉 Special Offer for Typing Maker! 🎉
-                    </Typography>
-                    <Typography variant="h6" sx={{mb: 2, opacity: 0.9, textShadow: "0 1px 2px rgba(0,0,0,0.2)"}}>
-                        Sign up now and get exclusive benefits!
-                    </Typography>
-                    <Box sx={{display: "flex", justifyContent: "center", gap: 3, flexWrap: "wrap"}}>
-                        <Box sx={{textAlign: "center"}}>
-                            <Typography variant="h4" sx={{fontWeight: 800}}>
-                                🏆
-                            </Typography>
-                            <Typography variant="body2">Compete in Weekly Challenges</Typography>
-                        </Box>
-                        <Box sx={{textAlign: "center"}}>
-                            <Typography variant="h4" sx={{fontWeight: 800}}>
-                                📊
-                            </Typography>
-                            <Typography variant="body2">Detailed Progress Analytics</Typography>
-                        </Box>
-                        <Box sx={{textAlign: "center"}}>
-                            <Typography variant="h4" sx={{fontWeight: 800}}>
-                                🎯
-                            </Typography>
-                            <Typography variant="body2">Personalized Training Plans</Typography>
-                        </Box>
-                    </Box>
-                    {!user && (
-                        <Button
-                            variant="contained"
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <OfferCard elevation={8} sx={{ mt: 8 }}>
+                    <Box sx={{ position: 'relative', zIndex: 1 }}>
+                        {/* Animated Cursor */}
+                        <Box
                             sx={{
-                                mt: 3,
-                                background: "rgba(255, 255, 255, 0.2)",
-                                border: "2px solid white",
-                                color: "white",
-                                fontWeight: 600,
-                                "&:hover": {
-                                    background: "rgba(255, 255, 255, 0.3)",
-                                    transform: "translateY(-2px)",
-                                },
+                                position: 'absolute',
+                                right: 20,
+                                top: 20,
+                                width: 12,
+                                height: 20,
+                                backgroundColor: 'white',
+                                borderRadius: '2px',
+                                animation: `${blink} 1s infinite`,
+                                boxShadow: '0 0 10px rgba(255,255,255,0.5)'
                             }}
-                            component={Link}
-                            to="/signup"
+                        />
+
+                        {/* Typing Animation Text */}
+                        <TypingText
+                            variant="h4"
+                            sx={{
+                                fontWeight: 800,
+                                mb: 1,
+                                textShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                            }}
+                            text="🚀 Boost Your Typing Skills!"
+                            speed={50}
+                        />
+
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                mb: 3,
+                                opacity: 0.95,
+                                background: 'linear-gradient(45deg, #fff, #e0f7fa)',
+                                backgroundClip: 'text',
+                                textFillColor: 'transparent',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}
                         >
-                            Sign Up Now - It's Free!
-                        </Button>
-                    )}
+                            Type Faster, Smarter, Better!
+                        </Typography>
+
+                        {/* Animated Keyboard Keys */}
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: 2,
+                            mb: 3,
+                            flexWrap: 'wrap'
+                        }}>
+                            {['SPEED', 'ACCURACY', 'PRODUCTIVITY'].map((word, index) => (
+                                <KeyboardKey key={index} delay={index * 0.3}>
+                                    {word}
+                                </KeyboardKey>
+                            ))}
+                        </Box>
+
+                        {/* Typing Stats with Animation */}
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'space-around',
+                            mb: 3,
+                            background: 'rgba(255,255,255,0.1)',
+                            borderRadius: 3,
+                            py: 2,
+                            px: 1,
+                            border: '1px solid rgba(255,255,255,0.2)'
+                        }}>
+                            <AnimatedStat number={65} label="WPM Increase" suffix="%" />
+                            <AnimatedStat number={40} label="Accuracy Boost" suffix="%" />
+                            <AnimatedStat number={100} label="Productivity" suffix="%" />
+                        </Box>
+
+                        {/* Progress Bar Animation */}
+                        <Box sx={{ mb: 3, px: 2 }}>
+                            <Typography variant="body2" sx={{ mb: 1, opacity: 0.9 }}>
+                                Your typing potential: <strong>100% UNLOCKED</strong>
+                            </Typography>
+                            <ProgressBar />
+                        </Box>
+
+                        {/* Features with Hover Animations */}
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+                            gap: 2,
+                            mb: 3
+                        }}>
+                            <TypingFeature
+                                icon="⌨️"
+                                title="Real-time Feedback"
+                                description="Instant WPM & accuracy tracking"
+                                delay={0}
+                            />
+                            <TypingFeature
+                                icon="📈"
+                                title="Progress Analytics"
+                                description="Detailed performance insights"
+                                delay={0.2}
+                            />
+                            <TypingFeature
+                                icon="🏆"
+                                title="Leaderboards"
+                                description="Compete with typists worldwide"
+                                delay={0.4}
+                            />
+                        </Box>
+
+                        {!user && (
+                            <Button
+                                variant="contained"
+                                sx={{
+                                    mt: 2,
+                                    background: 'linear-gradient(45deg, #ff4081, #7c4dff)',
+                                    border: '2px solid rgba(255,255,255,0.3)',
+                                    color: 'white',
+                                    fontWeight: 700,
+                                    fontSize: '1.1rem',
+                                    py: 1.5,
+                                    px: 4,
+                                    borderRadius: 3,
+                                    textTransform: 'none',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #ff4081, #7c4dff)',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 8px 25px rgba(124, 77, 255, 0.4)',
+                                    },
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: '-100%',
+                                        width: '100%',
+                                        height: '100%',
+                                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                                        transition: 'left 0.5s',
+                                    },
+                                    '&:hover::before': {
+                                        left: '100%',
+                                    }
+                                }}
+                                component={Link}
+                                to="/signup"
+                            >
+                                🚀 Start Typing Now - FREE!
+                            </Button>
+                        )}
+                    </Box>
+                    <FloatingKey icon="A" left="10%" delay={0} />
+                    <FloatingKey icon="S" left="20%" delay={1} />
+                    <FloatingKey icon="D" left="30%" delay={2} />
+                    <FloatingKey icon="F" left="40%" delay={3} />
+                    <FloatingKey icon="J" left="60%" delay={4} />
+                    <FloatingKey icon="K" left="70%" delay={5} />
+                    <FloatingKey icon="L" left="80%" delay={6} />
+                    <FloatingKey icon=";" left="90%" delay={7} />
                 </OfferCard>
-                <Box sx={{textAlign: "center", mb: 4}}>
+                <Box sx={{ textAlign: "center", mb: 4 }}>
                     <Title variant="h2" component="h1" gutterBottom>
                         Typing Maker
                     </Title>
@@ -352,7 +616,7 @@ const TypingTest = () => {
                     <Grid item xs={12} md={8}>
                         <TextDisplay text={text} userInput={userInput} currentIndex={currentIndex} />
 
-                        <Box sx={{mt: 3, position: "relative"}}>
+                        <Box sx={{ mt: 3, position: "relative" }}>
                             <WordInput
                                 value={userInput}
                                 onChange={handleInputChange}
@@ -479,13 +743,13 @@ const TypingTest = () => {
                                         textShadow:
                                             errors > 0
                                                 ? (theme) =>
-                                                      theme.palette.mode === "dark"
-                                                          ? "0 0 10px rgba(244, 67, 54, 0.5)"
-                                                          : "0 0 5px rgba(244, 67, 54, 0.3)"
+                                                    theme.palette.mode === "dark"
+                                                        ? "0 0 10px rgba(244, 67, 54, 0.5)"
+                                                        : "0 0 5px rgba(244, 67, 54, 0.3)"
                                                 : (theme) =>
-                                                      theme.palette.mode === "dark"
-                                                          ? "0 0 10px rgba(124, 77, 255, 0.5)"
-                                                          : "0 0 5px rgba(124, 77, 255, 0.3)",
+                                                    theme.palette.mode === "dark"
+                                                        ? "0 0 10px rgba(124, 77, 255, 0.5)"
+                                                        : "0 0 5px rgba(124, 77, 255, 0.3)",
                                     }}
                                 >
                                     {errors}
@@ -530,11 +794,11 @@ const TypingTest = () => {
                                     : "1px solid rgba(124, 77, 255, 0.2)",
                         }}
                     >
-                        <Typography variant="h6" gutterBottom sx={{fontWeight: 600}}>
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                             Overall Statistics
                         </Typography>
 
-                        <Box sx={{display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2}}>
+                        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
                             <Box>
                                 <Typography variant="body2" color="textSecondary">
                                     Tests Completed
@@ -596,8 +860,8 @@ const TypingTest = () => {
                 {saveStatus.message && (
                     <Alert
                         severity={saveStatus.success ? "success" : "error"}
-                        sx={{mt: 2}}
-                        onClose={() => setSaveStatus({success: null, message: ""})}
+                        sx={{ mt: 2 }}
+                        onClose={() => setSaveStatus({ success: null, message: "" })}
                     >
                         {saveStatus.message}
                     </Alert>
