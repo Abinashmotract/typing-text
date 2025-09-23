@@ -27,7 +27,7 @@ const Footer = () => {
           <Typography variant="body2" color="text.secondary">
             © {new Date().getFullYear()} Visit our other product -{" "}
             <a
-              href="https://convertmedia.com"
+              href="https://convertermedia.com/"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "inherit", textDecoration: "none", fontWeight: "bold" }}
@@ -36,12 +36,12 @@ const Footer = () => {
             </a>
             ,{" "}
             <a
-              href="https://madco.com/lander"
+              href="https://madco.in/lander"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "inherit", textDecoration: "none", fontWeight: "bold" }}
             >
-              Madco.com
+               Madco.in 
             </a>
           </Typography>
 

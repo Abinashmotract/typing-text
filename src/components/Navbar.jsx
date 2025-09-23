@@ -31,15 +31,14 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
       : "rgba(245, 245, 247, 0.8)",
   backdropFilter: "blur(10px)",
   boxShadow: "none",
-  borderBottom: `1px solid ${
-    theme.palette.mode === "dark"
+  borderBottom: `1px solid ${theme.palette.mode === "dark"
       ? "rgba(255, 255, 255, 0.1)"
       : "rgba(0, 0, 0, 0.1)"
-  }`,
+    }`,
 }));
 
 const Navbar = () => {
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const theme = useTheme();
   const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -50,7 +49,7 @@ const Navbar = () => {
   const isAuthenticated = !!user; // true if user exists
 
   const navItems = [
-    { label: "Practice", path: "/" },
+    { label: "Practice", action: "scroll" }, ,
     { label: "Profile", path: "/profile", requiresAuth: true },
   ];
 
@@ -75,6 +74,24 @@ const Navbar = () => {
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {navItems.map((item) => {
         if (item.requiresAuth && !isAuthenticated) return null;
+
+        if (item.action === "scroll") {
+          return (
+            <Button
+              key="practice"
+              variant="text"
+              color="inherit"
+              onClick={() => {
+                window.scrollTo({
+                  top: document.body.scrollHeight,
+                  behavior: "smooth",
+                });
+              }}
+            >
+              {item.label}
+            </Button>
+          );
+        }
 
         return (
           <Button
@@ -101,6 +118,7 @@ const Navbar = () => {
     </Box>
   );
 
+
   const renderAuthButtons = () => (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {isAuthenticated ? (
@@ -109,11 +127,10 @@ const Navbar = () => {
             onClick={handleProfileMenuOpen}
             sx={{
               color: "inherit",
-              border: `1px solid ${
-                theme.palette.mode === "dark"
+              border: `1px solid ${theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255, 0.2)"
                   : "rgba(0, 0, 0, 0.2)"
-              }`,
+                }`,
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
@@ -130,11 +147,10 @@ const Navbar = () => {
                 minWidth: 180,
                 backgroundColor: theme.palette.background.paper,
                 backdropFilter: "blur(10px)",
-                border: `1px solid ${
-                  theme.palette.mode === "dark"
+                border: `1px solid ${theme.palette.mode === "dark"
                     ? "rgba(255, 255, 255, 0.1)"
                     : "rgba(0, 0, 0, 0.1)"
-                }`,
+                  }`,
               },
             }}
           >
