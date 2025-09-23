@@ -14,19 +14,37 @@ const Footer = () => {
         borderColor: "divider",
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="md">
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            flexDirection: { xs: "column", sm: "row" }, 
+            flexDirection: { xs: "column", sm: "row" },
             gap: 1,
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} Typing Test App. All rights reserved.
+            © {new Date().getFullYear()} Visit our other product -{" "}
+            <a
+              href="https://convertmedia.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "inherit", textDecoration: "none", fontWeight: "bold" }}
+            >
+              convertmedia.com
+            </a>
+            ,{" "}
+            <a
+              href="https://madco.com/lander"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "inherit", textDecoration: "none", fontWeight: "bold" }}
+            >
+              Madco.com
+            </a>
           </Typography>
+
           <Box sx={{ display: "flex", gap: 2 }}>
             <MuiLink
               component={Link}

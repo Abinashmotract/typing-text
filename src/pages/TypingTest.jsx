@@ -193,13 +193,6 @@ const Title = styled(Typography)(({theme}) => ({
     letterSpacing: "2px",
 }));
 
-const StyledAppBar = styled(AppBar)(({theme}) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "rgba(18, 18, 18, 0.8)" : "rgba(245, 245, 247, 0.8)",
-    backdropFilter: "blur(10px)",
-    boxShadow: "none",
-    borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"}`,
-}));
-
 const TypingTest = () => {
     const [testDuration, setTestDuration] = useState(0);
     const [stats, setStats] = useState(null);
@@ -283,14 +276,14 @@ const TypingTest = () => {
                 <div className="shape" />
             </AnimatedBackground>
 
-            <Container maxWidth="lg" sx={{py: 4}}>
+            <Container maxWidth="md" sx={{py: 4}}>
                 <OfferCard elevation={6}>
                     <Typography
                         variant="h5"
                         gutterBottom
                         sx={{fontWeight: 700, textShadow: "0 2px 4px rgba(0,0,0,0.2)"}}
                     >
-                        🎉 Special Offer for Typing Masters! 🎉
+                        🎉 Special Offer for Typing Maker! 🎉
                     </Typography>
                     <Typography variant="h6" sx={{mb: 2, opacity: 0.9, textShadow: "0 1px 2px rgba(0,0,0,0.2)"}}>
                         Sign up now and get exclusive benefits!
@@ -338,7 +331,7 @@ const TypingTest = () => {
                 </OfferCard>
                 <Box sx={{textAlign: "center", mb: 4}}>
                     <Title variant="h2" component="h1" gutterBottom>
-                        Typing Master
+                        Typing Maker
                     </Title>
                     <Typography
                         variant="h6"

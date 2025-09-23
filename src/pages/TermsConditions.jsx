@@ -35,7 +35,7 @@ import {
 // Terms & Conditions component
 const TermsAndConditions = () => {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom align="center" color="primary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <GavelIcon sx={{ mr: 2, fontSize: '2.5rem' }} /> Terms & Conditions
       </Typography>
