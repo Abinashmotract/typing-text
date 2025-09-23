@@ -284,7 +284,7 @@ const Navbar = () => {
               flexGrow: { xs: 1, md: 0 },
             }}
           >
-            Typing Master
+            Typing Maker
           </Typography>
 
           {!isMobile && (

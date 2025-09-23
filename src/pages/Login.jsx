@@ -110,7 +110,7 @@ const Login = () => {
         <Box component='form' onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <TextField
             fullWidth
-            placeholder='Email or Phone Number'
+            placeholder='Email'
             name='identifier'
             value={formData.identifier}
             onChange={handleChange}
