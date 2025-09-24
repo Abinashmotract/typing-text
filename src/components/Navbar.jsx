@@ -32,8 +32,8 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backdropFilter: "blur(10px)",
   boxShadow: "none",
   borderBottom: `1px solid ${theme.palette.mode === "dark"
-      ? "rgba(255, 255, 255, 0.1)"
-      : "rgba(0, 0, 0, 0.1)"
+    ? "rgba(255, 255, 255, 0.1)"
+    : "rgba(0, 0, 0, 0.1)"
     }`,
 }));
 
@@ -87,6 +87,13 @@ const Navbar = () => {
                   behavior: "smooth",
                 });
               }}
+              sx={{
+                color: theme.palette.mode === "light" ? "black" : "white",
+                border: `1px solid ${theme.palette.mode === "light" ? "black" : "white"}`,
+                fontWeight: 500,
+                borderRadius: 2,
+                textTransform: "none",
+              }}
             >
               {item.label}
             </Button>
@@ -128,8 +135,8 @@ const Navbar = () => {
             sx={{
               color: "inherit",
               border: `1px solid ${theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.2)"
-                  : "rgba(0, 0, 0, 0.2)"
+                ? "rgba(255, 255, 255, 0.2)"
+                : "rgba(0, 0, 0, 0.2)"
                 }`,
             }}
           >
@@ -148,8 +155,8 @@ const Navbar = () => {
                 backgroundColor: theme.palette.background.paper,
                 backdropFilter: "blur(10px)",
                 border: `1px solid ${theme.palette.mode === "dark"
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "rgba(0, 0, 0, 0.1)"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)"
                   }`,
               },
             }}

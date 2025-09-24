@@ -432,7 +432,7 @@ const TypingTest = () => {
             </AnimatedBackground>
 
             <Container maxWidth="md" sx={{ py: 4 }}>
-                <OfferCard elevation={8} sx={{ mt: 12 }}>
+                <OfferCard elevation={8} sx={{ mt: 8 }}>
                     <Box sx={{ position: 'relative', zIndex: 1 }}>
                         {/* Animated Cursor */}
                         <Box
